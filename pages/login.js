@@ -50,7 +50,10 @@ export default function Login() {
 
                 {/* bottom */}
                 <p className="text-center text-gray-400">
-                    No tienes una cuenta? <Link href={'/register'}> <a>Registrarse</a> </Link>
+                    No tienes una cuenta?
+                    <Link href={'/register'}>
+                        <span className=" text-blue-700"> Registrarse</span>
+                    </Link>
                 </p>
 
             </section>
