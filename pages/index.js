@@ -16,3 +16,9 @@ export default function Home() {
     </div>
   )
 }
+
+
+//Guest page
+function Guest() {
+
+}
