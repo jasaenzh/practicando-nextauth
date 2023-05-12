@@ -8,10 +8,15 @@ import { HiAtSymbol, HiFingerPrint } from "react-icons/hi";
 import { useState } from "react";
 import { signIn, signOut } from 'next-auth/react'
 import { useFormik } from "formik";
-import login_validate from "../lib/validate";
+import { login_validate } from "../lib/validate";
+import { useRouter } from "next/router";
+
 
 export default function Login() {
+
     const [show, setShow] = useState(false);
+
+    const router = useRouter();
 
     //utilizo el hook para validar los campos formik
     const formik = useFormik({
@@ -30,9 +35,18 @@ export default function Login() {
         setShow(!show)
     }
 
-    //Funcion para dar onSubmit al formulario
+    //Funcion para Logearse con credenciales
     async function onSubmit(values) {
-        console.log(values)
+        const status = await signIn('credentials', {
+            redirect: false,
+            email: values.email,
+            password: values.password,
+            callbackUrl: "http://localhost:3000"
+        })
+
+        if (status.ok) {
+            router.push(status.url)
+        }
     }
 
     // Funcion para logearnos con Google
@@ -58,7 +72,7 @@ export default function Login() {
 
                 {/* form */}
                 <form className="flex flex-col gap-5" onSubmit={formik.handleSubmit}>
-                    <div className={styles.input_group}>
+                    <div className={`${styles.input_group} ${formik.errors.email && formik.touched.email ? 'border-rose-600' : ''}`}>
                         <input
                             type="email"
                             name="email"
@@ -71,8 +85,9 @@ export default function Login() {
                         </span>
                     </div>
                     {/* Aca se muestran los errores del campo email */}
-                    {formik.errors.email && formik.touched.email ? <span className="text-rose-500">{formik.errors.email}</span> : <></>}
-                    <div className={styles.input_group}>
+                    {/* {formik.errors.email && formik.touched.email ? <span className="text-rose-500">{formik.errors.email}</span> : <></>} */}
+
+                    <div className={`${styles.input_group} ${formik.errors.password && formik.touched.password ? 'border-rose-600' : ''}`}>
                         <input
                             type={`${show ? 'text' : 'password'}`}
                             name="password"
@@ -86,7 +101,7 @@ export default function Login() {
 
                     </div>
                     {/* Aca se muestran los errores del campo password  */}
-                    {formik.errors.password && formik.touched.password ? <span className="text-rose-500">{formik.errors.password}</span> : <></>}
+                    {/* {formik.errors.password && formik.touched.password ? <span className="text-rose-500">{formik.errors.password}</span> : <></>} */}
 
                     {/* Login Bottons */}
                     <div className="input-button">
