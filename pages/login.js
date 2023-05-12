@@ -6,9 +6,45 @@ import styles from '../styles/Form.module.css'
 import Image from 'next/image';
 import { HiAtSymbol, HiFingerPrint } from "react-icons/hi";
 import { useState } from "react";
+import { signIn, signOut } from 'next-auth/react'
+import { useFormik } from "formik";
+import login_validate from "../lib/validate";
 
 export default function Login() {
     const [show, setShow] = useState(false);
+
+    //utilizo el hook para validar los campos formik
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            password: '',
+        },
+        //valido los campos
+        validate: login_validate,
+        // envia la info
+        onSubmit: onSubmit
+    })
+
+    //Funcion para mostrar o no la contraseña
+    function showPassword() {
+        setShow(!show)
+    }
+
+    //Funcion para dar onSubmit al formulario
+    async function onSubmit(values) {
+        console.log(values)
+    }
+
+    // Funcion para logearnos con Google
+    async function handleGoogleSignIn() {
+        signIn('google', { callbackUrl: "http://localhost:3000" })
+    }
+
+    // Funcion para logearnos con Github
+    async function handleGithubSignIn() {
+        signIn('github', { callbackUrl: "http://localhost:3000" })
+    };
+
     return (
         <Layout>
             <Head>
@@ -21,30 +57,37 @@ export default function Login() {
                 </div>
 
                 {/* form */}
-                <form className="flex flex-col gap-5">
+                <form className="flex flex-col gap-5" onSubmit={formik.handleSubmit}>
                     <div className={styles.input_group}>
                         <input
                             type="email"
                             name="email"
                             placeholder="Email"
                             className={styles.input_text}
+                            {...formik.getFieldProps('email')}
                         />
                         <span className="icon flex items-center px-4">
                             <HiAtSymbol size={25} />
                         </span>
                     </div>
+                    {/* Aca se muestran los errores del campo email */}
+                    {formik.errors.email && formik.touched.email ? <span className="text-rose-500">{formik.errors.email}</span> : <></>}
                     <div className={styles.input_group}>
                         <input
                             type={`${show ? 'text' : 'password'}`}
                             name="password"
                             placeholder="Password"
                             className={styles.input_text}
-
+                            {...formik.getFieldProps('password')}
                         />
                         <span className="icon flex items-center px-4" onClick={() => setShow(!show)}>
                             <HiFingerPrint size={25} />
                         </span>
+
                     </div>
+                    {/* Aca se muestran los errores del campo password  */}
+                    {formik.errors.password && formik.touched.password ? <span className="text-rose-500">{formik.errors.password}</span> : <></>}
+
                     {/* Login Bottons */}
                     <div className="input-button">
                         <button type="submit" className={styles.button}>
@@ -52,12 +95,19 @@ export default function Login() {
                         </button>
                     </div>
                     <div className="input-button">
-                        <button type="button" className={styles.button_custom}>
+                        <button
+                            type="button"
+                            className={styles.button_custom}
+                            onClick={handleGoogleSignIn}
+                        >
                             Iniciar sesion con Google <Image src={'/asset/google.svg'} width="20" height={20}></Image>
                         </button>
                     </div>
                     <div className="input-button">
-                        <button type="button" className={styles.button_custom}>
+                        <button
+                            type="button"
+                            className={styles.button_custom}
+                            onClick={handleGithubSignIn}>
                             Iniciar sesion con Github <Image src={'/asset/github.svg'} width="20" height={20}></Image>
                         </button>
                     </div>
